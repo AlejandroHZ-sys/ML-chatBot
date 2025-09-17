@@ -334,13 +334,12 @@ def handle_aduanas_for_guide(guia: str):
     # Determina escenario de forma determinista y reproducible
     scenario = compute_scenario(guia, n_states=3)
     
-    # DEBUG: Mostrar a qué escenario va (puedes quitar esta línea después)
+    # DEBUG
     print(f"\n[DEBUG] Guía: {guia} → Escenario: {scenario}")
 
     print(f"\n✅ Resultado para guía #{guia}:")
 
     if scenario == 0:
-        # Impuestos por pagar — ahora sin mostrar importe en pantalla
         print("- Estado aduanal: En aduana — se requieren impuestos para liberar el paquete.")
         print("- Nota: El importe y los detalles de pago se enviarán si solicitas 'detalles'.")
         print("\nSi deseas proceder, al pedir 'detalles' te pediremos un correo y te enviaremos la información (simulado).")
@@ -349,39 +348,36 @@ def handle_aduanas_for_guide(guia: str):
             print("\nOpciones: 1) Detalles  2) Pagar (link)  3) Más información  4) Volver al menú  5) Salir  6) Hablar con agente")
             respuesta = input("Elige opción (número o texto): ").strip()
 
-            if respuesta == "1":
+            if aduana_detalles_RE.search(respuesta) or respuesta == "1":
                 email = input_valid_email("Para enviarte los detalles, ingresa tu correo: ")
                 print(f"\n✅ Listo. Hemos enviado al correo {email} el importe a pagar y los pasos para completar el proceso.")
                 print("Revisa tu bandeja (incluido SPAM). Una vez realizado el pago, tu paquete continuará su proceso de liberación.")
                 return True
 
-            elif respuesta == "2":
+            elif aduana_pagar_RE.search(respuesta) or respuesta == "2":
                 print("\n🔗 Link de pago seguro: https://www.dhl.com/pay-my-duty-tax")
                 print("Al acceder verás las instrucciones y el importe en el portal seguro o en el correo si solicitaste 'detalles'.")
                 return True
 
-            elif respuesta == "3":
+            elif aduana_info_RE.search(respuesta) or respuesta == "3":
                 print("\nℹ️ Los cargos aduanales suelen incluir aranceles e IVA; dependen del valor declarado, tipo de mercancía y país de origen.")
                 print("El importe exacto se comunica por correo o en el portal de pago para proteger la precisión de los datos.")
-            
-            elif respuesta == "4":
-                # VOLVER AL MENÚ: directo
+
+            elif aduana_menu_RE.search(respuesta) or respuesta == "4":
                 return True
-            
-            elif respuesta == "5":
-                # SALIR: directo
+
+            elif aduana_exit_RE.search(respuesta) or respuesta == "5":
                 print("Gracias. Cerrando sesión. ¡Hasta pronto!")
                 sys.exit(0)
-            
-            elif respuesta == "6":
-                # HABLAR CON AGENTE: directo
+
+            elif aduana_agent_RE.search(respuesta) or respuesta == "6":
                 print("\nEn breve un agente se contactará con usted.")
                 return True
+
             else:
                 print("No entendí. Escribe '1'..'6' o el texto correspondiente (ej: 'detalles', 'pagar', 'información', 'agente', 'volver').")
 
     elif scenario == 1:
-        # Pendiente de documentación
         print("- Estado aduanal: En revisión — se requiere documentación adicional.")
         print("- Nota: Para ver instrucciones y dónde subir documentos, solicita 'detalles' o 'subir documentos'.")
 
@@ -389,34 +385,36 @@ def handle_aduanas_for_guide(guia: str):
             print("\nOpciones: 1) Ver documentos  2) Subir documentos  3) Más información  4) Volver al menú  5) Salir  6) Hablar con agente")
             respuesta = input("Elige opción (número o texto): ").strip()
 
-            if respuesta == "1":
+            if aduana_detalles_RE.search(respuesta) or respuesta == "1":
                 print("\n📋 Documentos requeridos:")
                 print("- Factura comercial (invoice) o comprobante de valor")
                 print("- Lista de empaque (packing list) si aplica")
                 print("- Identificación oficial del consignatario")
                 print("- Permisos o certificaciones especiales si aplica")
-            elif respuesta == "2":
+
+            elif aduana_pagar_RE.search(respuesta) or respuesta == "2":
                 email = input_valid_email("Ingresa tu correo para recibir instrucciones de subida: ")
                 print(f"📧 Instrucciones enviadas a {email}. Revisa tu bandeja.")
                 return True
-            elif respuesta == "3":
+
+            elif aduana_info_RE.search(respuesta) or respuesta == "3":
                 print("\nℹ️ El proceso de revisión aduanal puede tardar 1-3 días hábiles.")
-            elif respuesta == "4":
-                # VOLVER AL MENÚ: directo
+
+            elif aduana_menu_RE.search(respuesta) or respuesta == "4":
                 return True
-            elif respuesta == "5":
-                # SALIR: directo
+
+            elif aduana_exit_RE.search(respuesta) or respuesta == "5":
                 print("Gracias. Cerrando sesión. ¡Hasta pronto!")
                 sys.exit(0)
-            elif respuesta == "6":
-                # HABLAR CON AGENTE: directo
+
+            elif aduana_agent_RE.search(respuesta) or respuesta == "6":
                 print("\nEn breve un agente se contactará con usted.")
                 return True
+
             else:
                 print("No entendí. Escribe '1'..'6' o el texto correspondiente.")
 
-    else:
-        # Liberado (scenario == 2)
+    else:  # scenario == 2
         print("- Estado aduanal: Liberado. No se generaron impuestos en este envío.")
         print("- Próximo paso: El paquete procederá a la entrega normal.")
         print("\nNota: Si necesitas programación operativa o recogida, selecciona la opción correspondiente en el menú principal.")
@@ -430,17 +428,18 @@ def handle_aduanas_for_guide(guia: str):
                 print("- Estado: Liberado de aduanas")
                 print("- Fecha estimada de entrega: 24-48 horas")
                 print("- Origen: Internacional")
-            elif respuesta == "2":
-                # VOLVER AL MENÚ: directo
+
+            elif aduana_menu_RE.search(respuesta) or respuesta == "2":
                 return True
-            elif respuesta == "3":
-                # SALIR: directo
+
+            elif aduana_exit_RE.search(respuesta) or respuesta == "3":
                 print("Gracias. Cerrando sesión. ¡Hasta pronto!")
                 sys.exit(0)
-            elif respuesta == "4":
-                # HABLAR CON AGENTE: directo
+
+            elif aduana_agent_RE.search(respuesta) or respuesta == "4":
                 print("\nEn breve un agente se contactará con usted.")
                 return True
+
             else:
                 print("No entendí. Escribe '1', '2', '3' o '4' o el texto correspondiente.")
 
