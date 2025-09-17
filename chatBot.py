@@ -359,11 +359,73 @@ while Salida:
         state = 0
 
     if state == 3:
-        origen = input("Origen: ")
-        destino = input("Destino: ")
-        peso = input("Peso (kg): ")
-        print(f"El envío de {origen} a {destino}, {peso} kg, tiene un costo aproximado de $500 MXN y entrega en 3 días.")
+        print("Cotización de envío")
+
+        origen = input("Origen: ").lower()
+        destino = input("Destino: ").lower()
+        try:
+            peso = float(input("Peso (kg): "))
+        except ValueError:
+            print("Por favor ingresa un número válido para el peso.")
+            state = 0
+            continue
+
+        # Definición de zonas ficticias
+        zonas = {
+            "Norte": {
+                "ciudades": ["tijuana", "mexicali", "ciudad juarez", "chihuahua", "saltillo", "monterrey"],
+                "base": 150,
+                "adicional": 50,
+                "tiempo": "2-3 días hábiles"
+            },
+            "Centro": {
+                "ciudades": ["cdmx", "queretaro", "toluca", "puebla", "leon", "morelia", "cuernavaca"],
+                "base": 120,
+                "adicional": 40,
+                "tiempo": "1-2 días hábiles"
+            },
+            "Sur": {
+                "ciudades": ["cancun", "merida", "acapulco", "veracruz", "tampico", "guadalajara"],
+                "base": 140,
+                "adicional": 45,
+                "tiempo": "2-4 días hábiles"
+            },
+            "Internacional": {
+                "ciudades": [],
+                "base": 500,
+                "adicional": 120,
+                "tiempo": "5-7 días hábiles"
+            }
+        }
+
+        # Detectar zona del destino
+        zona_detectada = "Internacional"  # por defecto
+        for zona, data in zonas.items():
+            for ciudad in data["ciudades"]:
+                if ciudad in destino.lower():
+                    zona_detectada = zona
+                    break
+
+        # Obtener parámetros de la zona
+        base = zonas[zona_detectada]["base"]
+        adicional = zonas[zona_detectada]["adicional"]
+        tiempo = zonas[zona_detectada]["tiempo"]
+
+        # Calcular costo
+        if peso <= 1:
+            costo = base
+        else:
+            costo = base + (peso - 1) * adicional
+
+        # Mostrar resultado
+        print(f"\n📦 Envío {zona_detectada}:")
+        print(f"De {origen} a {destino}")
+        print(f"Peso: {peso} kg")
+        print(f"💲 Costo estimado: ${costo:.2f} MXN")
+        print(f"⏳ Tiempo estimado de entrega: {tiempo}")
+
         state = 0
+
 
     if state == 4:
         # Intenta detectar la ciudad en la primera pregunta del usuario
