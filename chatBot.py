@@ -263,6 +263,188 @@ def detectar_ciudad(texto):
                 return ciudad
     return None
 
+#funcioones Aduana
+def print_main_menu():
+    """Imprime exactamente el menú principal que pediste (sin modificar)."""
+    print("\nOpciones disponibles:")
+    print("1. Rastreo de envíos")
+    print("2. Agendar recogida")
+    print("3. Cotización / tarifas")
+    print("4. Localización de sucursales")
+    print("5. Estado de aduanas")
+    print("6. Entregas fallidas / reclamos")
+    print("7. Crear un envío")
+    print("8. Hablar con un agente humano")
+    print("9. Salir")
+
+def input_valid_guide(prompt="Ingresa tu número de guía DHL: "):
+    """Valida que la guía tenga exactamente 15 dígitos. Reintenta hasta válido."""
+    while True:
+        guia = input(prompt).strip()
+        # Permitir modo forzar con suffix :0/:1/:2 (pero base debe ser 15 dígitos)
+        base = guia.split(':', 1)[0]
+        if re.fullmatch(r"\d{15}", base):
+            return guia
+        else:
+            print("Número de guía inválido. Debe contener exactamente 15 dígitos (ej: 123456789012345). Intenta de nuevo.")
+
+def input_valid_email(prompt="Ingresa tu correo electrónico: "):
+    """Valida formato de email básico. Reintenta hasta válido."""
+    email_re = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    while True:
+        email = input(prompt).strip()
+        if email_re.match(email):
+            return email
+        else:
+            print("Correo inválido. Asegúrate de escribir una dirección de correo válida (ej: usuario@dominio.com).")
+
+def compute_scenario(guia: str, n_states: int = 3) -> int:
+    """
+    Devuelve un entero entre 0 y n_states-1.
+    Si la guia termina en ':0' / ':1' / ':2' (etc.), fuerza ese escenario (útil para pruebas).
+    Usa el último dígito de la guía para mejor distribución.
+    """
+    guia = (guia or "").strip()
+    if not guia:
+        return 0
+    
+    # modo forzar
+    if ':' in guia:
+        parts = guia.rsplit(':', 1)
+        if parts[1].isdigit():
+            forced = int(parts[1])
+            if 0 <= forced < n_states:
+                return forced
+    
+    # usar el último dígito de la guía base para distribución
+    base_guia = guia.split(':', 1)[0]
+    if base_guia and base_guia[-1].isdigit():
+        last_digit = int(base_guia[-1])
+        return last_digit % n_states
+    else:
+        # fallback
+        return 0
+
+def handle_aduanas_for_guide(guia: str):
+    guia = (guia or "").strip()
+    if not guia:
+        print("No ingresaste número de guía. Intenta de nuevo.")
+        return
+
+    # Determina escenario de forma determinista y reproducible
+    scenario = compute_scenario(guia, n_states=3)
+    
+    # DEBUG: Mostrar a qué escenario va (puedes quitar esta línea después)
+    print(f"\n[DEBUG] Guía: {guia} → Escenario: {scenario}")
+
+    print(f"\n✅ Resultado para guía #{guia}:")
+
+    if scenario == 0:
+        # Impuestos por pagar — ahora sin mostrar importe en pantalla
+        print("- Estado aduanal: En aduana — se requieren impuestos para liberar el paquete.")
+        print("- Nota: El importe y los detalles de pago se enviarán si solicitas 'detalles'.")
+        print("\nSi deseas proceder, al pedir 'detalles' te pediremos un correo y te enviaremos la información (simulado).")
+
+        while True:
+            print("\nOpciones: 1) Detalles  2) Pagar (link)  3) Más información  4) Volver al menú  5) Salir  6) Hablar con agente")
+            respuesta = input("Elige opción (número o texto): ").strip()
+
+            if respuesta == "1":
+                email = input_valid_email("Para enviarte los detalles, ingresa tu correo: ")
+                print(f"\n✅ Listo. Hemos enviado al correo {email} el importe a pagar y los pasos para completar el proceso.")
+                print("Revisa tu bandeja (incluido SPAM). Una vez realizado el pago, tu paquete continuará su proceso de liberación.")
+                return
+
+            elif respuesta == "2":
+                print("\n🔗 Link de pago seguro: https://www.dhl.com/pay-my-duty-tax")
+                print("Al acceder verás las instrucciones y el importe en el portal seguro o en el correo si solicitaste 'detalles'.")
+                return
+
+            elif respuesta == "3":
+                print("\nℹ️ Los cargos aduanales suelen incluir aranceles e IVA; dependen del valor declarado, tipo de mercancía y país de origen.")
+                print("El importe exacto se comunica por correo o en el portal de pago para proteger la precisión de los datos.")
+            
+            elif respuesta == "4":
+                # VOLVER AL MENÚ: directo
+                return
+            
+            elif respuesta == "5":
+                # SALIR: directo
+                print("Gracias. Cerrando sesión. ¡Hasta pronto!")
+                sys.exit(0)
+            
+            elif respuesta == "6":
+                # HABLAR CON AGENTE: directo
+                print("\nEn breve un agente se contactará con usted.")
+                return
+            else:
+                print("No entendí. Escribe '1'..'6' o el texto correspondiente (ej: 'detalles', 'pagar', 'información', 'agente', 'volver').")
+
+    elif scenario == 1:
+        # Pendiente de documentación
+        print("- Estado aduanal: En revisión — se requiere documentación adicional.")
+        print("- Nota: Para ver instrucciones y dónde subir documentos, solicita 'detalles' o 'subir documentos'.")
+
+        while True:
+            print("\nOpciones: 1) Ver documentos  2) Subir documentos  3) Más información  4) Volver al menú  5) Salir  6) Hablar con agente")
+            respuesta = input("Elige opción (número o texto): ").strip()
+
+            if respuesta == "1":
+                print("\n📋 Documentos requeridos:")
+                print("- Factura comercial (invoice) o comprobante de valor")
+                print("- Lista de empaque (packing list) si aplica")
+                print("- Identificación oficial del consignatario")
+                print("- Permisos o certificaciones especiales si aplica")
+            elif respuesta == "2":
+                email = input_valid_email("Ingresa tu correo para recibir instrucciones de subida: ")
+                print(f"📧 Instrucciones enviadas a {email}. Revisa tu bandeja.")
+                return
+            elif respuesta == "3":
+                print("\nℹ️ El proceso de revisión aduanal puede tardar 1-3 días hábiles.")
+            elif respuesta == "4":
+                # VOLVER AL MENÚ: directo
+                return
+            elif respuesta == "5":
+                # SALIR: directo
+                print("Gracias. Cerrando sesión. ¡Hasta pronto!")
+                sys.exit(0)
+            elif respuesta == "6":
+                # HABLAR CON AGENTE: directo
+                print("\nEn breve un agente se contactará con usted.")
+                return
+            else:
+                print("No entendí. Escribe '1'..'6' o el texto correspondiente.")
+
+    else:
+        # Liberado (scenario == 2)
+        print("- Estado aduanal: Liberado. No se generaron impuestos en este envío.")
+        print("- Próximo paso: El paquete procederá a la entrega normal.")
+        print("\nNota: Si necesitas programación operativa o recogida, selecciona la opción correspondiente en el menú principal.")
+
+        while True:
+            print("\nOpciones: 1) Ver detalles  2) Volver al menú  3) Salir  4) Hablar con agente")
+            respuesta = input("Elige opción (número o texto): ").strip()
+
+            if aduana_detalles_RE.search(respuesta) or respuesta == "1":
+                print(f"\n📦 Detalles del envío #{guia}:")
+                print("- Estado: Liberado de aduanas")
+                print("- Fecha estimada de entrega: 24-48 horas")
+                print("- Origen: Internacional")
+            elif respuesta == "2":
+                # VOLVER AL MENÚ: directo
+                return
+            elif respuesta == "3":
+                # SALIR: directo
+                print("Gracias. Cerrando sesión. ¡Hasta pronto!")
+                sys.exit(0)
+            elif respuesta == "4":
+                # HABLAR CON AGENTE: directo
+                print("\nEn breve un agente se contactará con usted.")
+                return
+            else:
+                print("No entendí. Escribe '1', '2', '3' o '4' o el texto correspondiente.")
+
+
 # Estado inicial
 state = 0
 Salida = True
