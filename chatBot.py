@@ -329,7 +329,7 @@ def handle_aduanas_for_guide(guia: str):
     guia = (guia or "").strip()
     if not guia:
         print("No ingresaste número de guía. Intenta de nuevo.")
-        return
+        return True
 
     # Determina escenario de forma determinista y reproducible
     scenario = compute_scenario(guia, n_states=3)
@@ -353,12 +353,12 @@ def handle_aduanas_for_guide(guia: str):
                 email = input_valid_email("Para enviarte los detalles, ingresa tu correo: ")
                 print(f"\n✅ Listo. Hemos enviado al correo {email} el importe a pagar y los pasos para completar el proceso.")
                 print("Revisa tu bandeja (incluido SPAM). Una vez realizado el pago, tu paquete continuará su proceso de liberación.")
-                return
+                return True
 
             elif respuesta == "2":
                 print("\n🔗 Link de pago seguro: https://www.dhl.com/pay-my-duty-tax")
                 print("Al acceder verás las instrucciones y el importe en el portal seguro o en el correo si solicitaste 'detalles'.")
-                return
+                return True
 
             elif respuesta == "3":
                 print("\nℹ️ Los cargos aduanales suelen incluir aranceles e IVA; dependen del valor declarado, tipo de mercancía y país de origen.")
@@ -366,7 +366,7 @@ def handle_aduanas_for_guide(guia: str):
             
             elif respuesta == "4":
                 # VOLVER AL MENÚ: directo
-                return
+                return True
             
             elif respuesta == "5":
                 # SALIR: directo
@@ -376,7 +376,7 @@ def handle_aduanas_for_guide(guia: str):
             elif respuesta == "6":
                 # HABLAR CON AGENTE: directo
                 print("\nEn breve un agente se contactará con usted.")
-                return
+                return True
             else:
                 print("No entendí. Escribe '1'..'6' o el texto correspondiente (ej: 'detalles', 'pagar', 'información', 'agente', 'volver').")
 
@@ -398,12 +398,12 @@ def handle_aduanas_for_guide(guia: str):
             elif respuesta == "2":
                 email = input_valid_email("Ingresa tu correo para recibir instrucciones de subida: ")
                 print(f"📧 Instrucciones enviadas a {email}. Revisa tu bandeja.")
-                return
+                return True
             elif respuesta == "3":
                 print("\nℹ️ El proceso de revisión aduanal puede tardar 1-3 días hábiles.")
             elif respuesta == "4":
                 # VOLVER AL MENÚ: directo
-                return
+                return True
             elif respuesta == "5":
                 # SALIR: directo
                 print("Gracias. Cerrando sesión. ¡Hasta pronto!")
@@ -411,7 +411,7 @@ def handle_aduanas_for_guide(guia: str):
             elif respuesta == "6":
                 # HABLAR CON AGENTE: directo
                 print("\nEn breve un agente se contactará con usted.")
-                return
+                return True
             else:
                 print("No entendí. Escribe '1'..'6' o el texto correspondiente.")
 
@@ -432,7 +432,7 @@ def handle_aduanas_for_guide(guia: str):
                 print("- Origen: Internacional")
             elif respuesta == "2":
                 # VOLVER AL MENÚ: directo
-                return
+                return True
             elif respuesta == "3":
                 # SALIR: directo
                 print("Gracias. Cerrando sesión. ¡Hasta pronto!")
@@ -440,7 +440,7 @@ def handle_aduanas_for_guide(guia: str):
             elif respuesta == "4":
                 # HABLAR CON AGENTE: directo
                 print("\nEn breve un agente se contactará con usted.")
-                return
+                return True
             else:
                 print("No entendí. Escribe '1', '2', '3' o '4' o el texto correspondiente.")
 
@@ -679,10 +679,13 @@ while Salida:
                 print("¡Claro! ¿Hay algo más en lo que pueda ayudarte?")
                 state = 0
                 break
-    if state == 5:
-        print("Tu envío está retenido en aduanas. Se requiere el pago de impuestos y documentación adicional.")
-        state = 0
 
+    if opcion == "5" or aduana_RE.search(opcion):
+        guia = input_valid_guide("Ingresa tu número de guía DHL (15 dígitos). ")
+        volver_menu = handle_aduanas_for_guide(guia)
+        if volver_menu:
+            state = 0  # vuelve al menú principal correctamente
+        continue
     if state == 6:
         print("Detectamos un intento de entrega fallido. Puedes reprogramar ingresando a tu portal DHL o llamando al 01-800-DHL.")
         state = 0
