@@ -21,7 +21,7 @@ tracking_RE   = r"(rastreo|tracking|seguimiento|localiza(r|ci[oó]n)|dónde (est
 pickup_RE     = r"(recogida|pickup|agendar (recogida|env[ií]o)|programar (env[ií]o|paquete)|quiero que lo recojan|pasen por mi paquete)"
 tarifa_RE     = r"(cotiza(r|ci[óo]n)|precio|tarifa|costo|cu[áa]nto vale|cu[áa]nto cuesta|cu[áa]nto sale|quiero saber.*(cuesta|precio)|promociones|costos)"
 sucursal_RE = (sucursal_ubicacion_RE + "|" +sucursal_horario_RE   + "|" +sucursal_servicios_RE + "|" +sucursal_apertura_RE  + "|" +sucursal_acciones_RE + "|" + sucursal_estacionamiento_RE + "|" + sucursal_accesibilidad_RE + "|" + sucursal_pago_RE)
-aduana_RE     = r"(aduana|aduna|impuesto|tax|documentaci[oó]n|pago pendiente|retenci[oó]n|servicio de aduana)"
+aduana_RE = re.compile(r"(aduana|aduna|impuesto|tax|documentaci[oó]n|pago pendiente|retenci[oó]n)", re.I)
 fallida_RE    = r"(entrega fallida|no lleg[óo]|no entregado|no lo recib[ií]|no recibi|no lleg[óo] mi paquete|no tengo mi paquete|porque no.*(recib|tengo|llego).*paquete|reprogramar|devoluci[óo]n|reclamo|incidente|por qu[ée] no)"
 crear_RE      = r"(crear env[íi]o|nuevo env[íi]o|enviar paquete|quiero enviar|generar gu[íi]a|mandar un paquete|hacer un env[íi]o|como (hago|crear|realizo) un env[íi]o)"
 agente_RE     = r"(hablar con humano|agente|soporte real|asesor|supervisor|empleado real|persona real|pasame (un|a) (humano|gerente|persona)|necesito (hablar|ayuda) con (alguien|una persona)|quiero hablar con un asistente)"
@@ -497,7 +497,7 @@ while Salida:
             state = 3
         elif re.search(sucursal_RE, opcion, flags=re.IGNORECASE):
             state = 4
-        elif re.search(aduana_RE, opcion, flags=re.IGNORECASE):
+        elif aduana_RE.search(opcion):
             state = 5
         elif re.search(crear_RE, opcion, flags=re.IGNORECASE):
             state = 7
