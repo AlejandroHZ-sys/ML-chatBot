@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 
 # Nuevas subcategorías de sucursal
-sucursal_ubicacion_RE = r"(sucursal(es)?|oficina(s)?|tienda(s)?|centro(s)?( de servicio)?|branch|store|ubicaci[oó]n|direcci[oó]n|domicilio|mapa|localizar|d[oó]nde|queda|cercan[ao]s?)"
+sucursal_ubicacion_RE = r"(sucursal(es)?|oficina(s)?|tienda(s)?|centro(s)?( de servicio)?|branch|store|ubicaci[oó]n|direcci[oó]n|domicilio|mapa|localizar|d[oó]nde|queda|cercan[ao]s?|visitar(los)?)"
 sucursal_horario_RE   = r"(horario(s)?|hora(s)?|abre(n)?|cierran?|apertura|cierre|atenci[oó]n)"
 sucursal_servicios_RE = r"(servicio(s)?|disponible(s)?|ofrecen|puedo hacer|hay en la sucursal|tr[aá]mites)"
 sucursal_apertura_RE  = r"(apertura|cierre|abrir|cerrar|a qu[eé] hora)"
@@ -45,7 +45,7 @@ aduana_exit_RE = re.compile(r"(salir|adios|adiós|terminar|finalizar|quit|exit|q
 # Dataset ficticio de sucursales por ciudad
 sucursales = {
     "cdmx": {
-        "alias": [r"\b(cdmx|ciudad de méxico|df|distrito federal|capital|méxico)\b"],
+        "alias": [r"\b(cdmx|ciudad de méxico|df|distrito federal|capital|méxico|mexico)\b"],
         "direccion": "Av. Paseo de la Reforma 123, Col. Juárez, CDMX",
         "horario": "Lunes a viernes 9:00 - 18:00, sábados 9:00 - 14:00",
         "servicios": "Envío y recolección de paquetes, pago de servicios, asesoría personalizada",
