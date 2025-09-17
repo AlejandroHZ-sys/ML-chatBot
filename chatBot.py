@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+import time
+import sys
 from datetime import datetime
 
 # Nuevas subcategorías de sucursal
@@ -24,6 +26,19 @@ fallida_RE    = r"(entrega fallida|no lleg[óo]|no entregado|no lo recib[ií]|no
 crear_RE      = r"(crear env[íi]o|nuevo env[íi]o|enviar paquete|quiero enviar|generar gu[íi]a|mandar un paquete|hacer un env[íi]o|como (hago|crear|realizo) un env[íi]o)"
 agente_RE     = r"(hablar con humano|agente|soporte real|asesor|supervisor|empleado real|persona real|pasame (un|a) (humano|gerente|persona)|necesito (hablar|ayuda) con (alguien|una persona)|quiero hablar con un asistente)"
 salir_RE      = r"(salir|adi[oó]s|terminar|gracias|ya no|bye|nos vemos|no|nada)"
+exit_RE = re.compile(r"^(salir|adios|adiós|terminar|gracias|quit|exit|q)$", re.I)
+
+aduana_pagar_RE = re.compile(r"(pagar|pago|comprobante|liquidar|link|enlace|1|uno|primero)", re.I)
+aduana_docs_RE = re.compile(r"(documentos|subir|enviar|adjuntar|adjunto|mandar documentos|subida|2|dos|segundo)", re.I)
+aduana_info_RE = re.compile(r"(informaci[oó]n|info|detalles|explicaci[oó]n|saber m[aá]s|3|tres|por qu[eé]|motivo|raz[oó]n)", re.I)
+aduana_agent_RE = re.compile(r"(agente|aduanal|contactar|llamar|especialista|asesor|humano|persona|representante|4|cuatro)", re.I)
+aduana_detalles_RE = re.compile(r"(detalles|ver|estado|status|seguimiento|tracking|d[oó]nde|ubicaci[oó]n|1|uno|primero)", re.I)
+# Intenciones operativas — se preguntará si el usuario necesita más ayuda
+aduana_programar_RE = re.compile(r"(programar|agendar|entrega|fecha|hora|cita|recogida|pickup|2|dos|cuando|cu[aá]ndo)", re.I)
+aduana_recoger_RE = re.compile(r"(recoger|sucursal|oficina|centro|buscar|pasar por|ir por|retirar|3|tres|tercero)", re.I)
+# 'volver al menu' y 'salir' detectables aquí
+aduana_menu_RE = re.compile(r"(volver al menu|menu|volver al menú|volver|regresar|principal|atr[aá]s|finalizar|terminar|4|5|cuatro|cinco|no|n)", re.I)
+aduana_exit_RE = re.compile(r"(salir|adios|adiós|terminar|finalizar|quit|exit|q|5|6)", re.I)
 
 
 
